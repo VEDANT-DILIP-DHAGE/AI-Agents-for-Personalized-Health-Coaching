@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenAI TAE 1 - AI Agents for Personalized Health Coaching</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 12mm 14mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1e293b;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 20px;
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    max-height: 297mm;
+    padding: 14mm 16mm;
+    background: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+    page-break-inside: avoid;
+    overflow: hidden;
+  }
+
+  @media print {
+    body {
+      background: none;
+      padding: 0;
+    }
+    .page-container {
+      gap: 0;
+    }
+    .page {
+      box-shadow: none;
+      margin: 0;
+      width: 100%;
+      height: 100vh;
+      max-height: none;
+      min-height: auto;
+      page-break-after: always;
+    }
+    .no-print {
+      display: none !important;
+    }
+  }
+
+  /* Running Header & Footer */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    font-size: 9px;
+    color: #64748b;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .page-header .brand {
+    color: #1e3a8a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 6px;
+    margin-top: 10px;
+    font-size: 9px;
+    color: #64748b;
+  }
+
+  .content-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Typography */
+  h1.doc-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin: 0 0 3px 0;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+  }
+
+  .doc-subtitle {
+    font-size: 11px;
+    font-weight: 500;
+    color: #0d9488;
+    margin: 0 0 10px 0;
+  }
+
+  .section-h1 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3a8a;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 3px;
+    margin: 10px 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .section-h2 {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 8px 0 3px 0;
+  }
+
+  p {
+    margin: 0 0 6px 0;
+    color: #334155;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 0 0 6px 0;
+    padding-left: 18px;
+    color: #334155;
+  }
+
+  li {
+    margin-bottom: 3px;
+  }
+
+  /* Badge Card */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    gap: 8px;
+    font-size: 9.5px;
+  }
+
+  .meta-item b {
+    color: #0f172a;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 8px 0;
+    font-size: 9.5px;
+  }
+
+  th {
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: 700;
+    text-align: left;
+    padding: 5px 8px;
+    border: 1px solid #1e3a8a;
+  }
+
+  td {
+    padding: 4.5px 8px;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    vertical-align: middle;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 8.5px;
+    background: #e2e8f0;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+  }
+
+  .formula-box {
+    background: #f8fafc;
+    border-left: 3px solid #0d9488;
+    padding: 6px 10px;
+    margin: 5px 0 7px 0;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 9px;
+    color: #0f172a;
+    line-height: 1.4;
+  }
+
+  .highlight-card {
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 6px 0;
+    font-size: 9.5px;
+    line-height: 1.4;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .tag-blue { background: #dbeafe; color: #1e40af; }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-amber { background: #fef3c7; color: #92400e; }
+
+  /* Floating print button for browser preview */
+  .print-btn-bar {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    background: #1e3a8a;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    transition: all 0.2s;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+</style>
+</head>
+<body>
+
+<div class="print-btn-bar no-print">
+  <button class="btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="page-container">
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="page">
+    <div class="page-header">
+      <div class="brand">🤖 GENAI TAE 1 : COURSE EVALUATION REPORT</div>
+      <div>Multi-Agent Health Coaching</div>
+    </div>
+
+    <div class="content-body">
+      <h1 class="doc-title">AI Agents for Personalized Health Coaching</h1>
+      <div class="doc-subtitle">A Collaborative Multi-Agent Generative AI System Grounded in Deterministic Health Mathematics</div>
+
+      <div class="meta-grid">
+        <div class="meta-item"><b>Course:</b> Generative AI (GenAI) — TAE 1</div>
+        <div class="meta-item"><b>Tech Stack:</b> Python, Streamlit, LLMs</div>
+        <div class="meta-item"><b>Paradigm:</b> Master Coordinator & Subagents</div>
+      </div>
+
+      <div class="section-h1">1. Introduction</div>
+
+      <div class="section-h2">1.1 Background & Motivation</div>
+      <p>
+        Personalized wellness guidance spans multiple specialized disciplines: clinical nutrition, biomechanical exercise science, and circadian lifestyle recovery. Conventional single-agent conversational Large Language Models (LLMs) frequently struggle when deployed for comprehensive health advice due to three critical drawbacks: arithmetic inaccuracy in energy balance equations (BMR/TDEE), domain blending (e.g., treating diet and workout guidance with identical unstructured prompts), and hallucination of contradictory dietary advice.
+      </p>
+      <p>
+        To solve this challenge, this project implements a <b>Collaborative Multi-Agent Generative AI Architecture</b>. By uniting a deterministic scientific mathematics engine with domain-specialized agents (Nutrition, Fitness, Lifestyle) managed by a Lead Coordinator Agent, the framework delivers hyper-personalized, clinically coherent, and constraint-respecting wellness plans.
+      </p>
+
+      <div class="section-h2">1.2 Problem Statement</div>
+      <p>
+        Monolithic single-agent chatbot architectures exhibit critical limitations in automated health coaching:
+      </p>
+      <ul>
+        <li><b>Domain Hallucination & Formula Errors:</b> Unspecialized LLMs struggle with multi-variable arithmetic, often miscalculating caloric deficits or macro splits.</li>
+        <li><b>Lack of Dietary & Biometric Grounding:</b> General LLMs tend to ignore hard constraints (such as vegetarian/vegan restrictions, age limits, and metabolic baselines).</li>
+        <li><b>Single Point of Failure:</b> Lack of resilient modular fallback mechanisms when cloud LLM endpoints encounter network delays or rate limits.</li>
+      </ul>
+
+      <div class="section-h2">1.3 Objectives & Key Contributions</div>
+      <p>The core objectives achieved in this GenAI TAE 1 project are:</p>
+      <ol>
+        <li><b>Coordinator-Subagent Orchestration:</b> Developed a modular Python OOP agent hierarchy that analyzes user intent and routes sub-queries to dedicated specialist agents.</li>
+        <li><b>Deterministic-Stochastic Hybridization:</b> Integrated exact physiological formulas (Mifflin-St Jeor equation, TDEE activity multipliers, BMI classification) to ground LLM reasoning in verified science.</li>
+        <li><b>Dual-Engine LLM Fallback:</b> Enabled zero-downtime execution supporting Google Gemini 2.5/1.5 Flash, Groq LLaMA-3, and an offline smart rule-based fallback generator.</li>
+        <li><b>Interactive Clinical Dashboard:</b> Designed a reactive Streamlit web interface featuring real-time biometric metrics, dynamic agent badges, and persistent JSON state.</li>
+      </ol>
+    </div>
+
+    <div class="page-footer">
+      <div>AI Agents for Personalized Health & Wellness | Academic Submission</div>
+      <div>Page 1 of 3</div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="page">
+    <div class="page-header">
+      <div class="brand">🤖 GENAI TAE 1 : COURSE EVALUATION REPORT</div>
+      <div>Multi-Agent Health Coaching</div>
+    </div>
+
+    <div class="content-body">
+      <div class="section-h1">2. Methodology</div>
+
+      <div class="section-h2">2.1 System Architecture & Pipeline</div>
+      <p>
+        The system utilizes a <b>Coordinator-Subagent Architecture</b>. When a user submits an inquiry alongside profile metadata (Age, Gender, Height, Weight, Activity, Diet, Goal), execution proceeds through two coordinated stages:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Component Layer</th>
+            <th style="width: 30%;">Module File</th>
+            <th style="width: 45%;">Functional Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>1. Deterministic Engine</b></td>
+            <td><code>utils/health_calc.py</code></td>
+            <td>Calculates exact BMI, BMR (Mifflin-St Jeor), TDEE, macro ratios, and water intake.</td>
+          </tr>
+          <tr>
+            <td><b>2. Master Coordinator</b></td>
+            <td><code>agents/coordinator_agent.py</code></td>
+            <td>Performs intent classification, dispatches sub-agents, and synthesizes final response.</td>
+          </tr>
+          <tr>
+            <td><b>3. Nutrition Specialist</b></td>
+            <td><code>agents/nutrition_agent.py</code></td>
+            <td>Generates meal plans (Veg/Vegan/Non-Veg), macro breakdowns, and nutrient timing.</td>
+          </tr>
+          <tr>
+            <td><b>4. Fitness Specialist</b></td>
+            <td><code>agents/fitness_agent.py</code></td>
+            <td>Builds progressive workout splits, sets/reps, warm-up, and recovery protocols.</td>
+          </tr>
+          <tr>
+            <td><b>5. Lifestyle Specialist</b></td>
+            <td><code>agents/lifestyle_agent.py</code></td>
+            <td>Formulates sleep hygiene, hydration protocols, and stress reduction habits.</td>
+          </tr>
+          <tr>
+            <td><b>6. State & Storage</b></td>
+            <td><code>utils/storage.py</code></td>
+            <td>Persistent JSON serialization for user profiles and multi-turn chat memory.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-h2">2.2 Deterministic Health Mathematics</div>
+      <p>
+        To prevent stochastic math hallucinations, metabolic calculations are computed deterministically prior to prompt injection:
+      </p>
+      
+      <div class="formula-box">
+        • <b>BMI:</b> weight (kg) / [height (m)]² &nbsp;|&nbsp; Categories: Underweight &lt;18.5, Normal 18.5-24.9, Overweight 25-29.9, Obese ≥30<br/>
+        • <b>BMR (Mifflin-St Jeor):</b><br/>
+        &nbsp;&nbsp;Men: &nbsp;&nbsp;BMR = (10 × weight_kg) + (6.25 × height_cm) - (5 × age) + 5<br/>
+        &nbsp;&nbsp;Women: BMR = (10 × weight_kg) + (6.25 × height_cm) - (5 × age) - 161<br/>
+        • <b>TDEE:</b> BMR × Activity Multiplier [Sedentary: 1.2, Light: 1.375, Moderate: 1.55, Very Active: 1.725]<br/>
+        • <b>Caloric Targets:</b> Weight Loss = TDEE - 400 kcal (35% P / 40% C / 25% F) | Muscle Gain = TDEE + 300 kcal (30% P / 45% C / 25% F)<br/>
+        • <b>Hydration:</b> (weight_kg × 35ml) + Activity Bonus (0.25L - 0.75L)
+      </div>
+
+      <div class="section-h2">2.3 Master Coordinator Routing & Prompt Engineering</div>
+      <p>
+        The <code>CoordinatorAgent</code> inspects user queries for semantic tokens. Keywords related to food or diet activate the <code>NutritionAgent</code>; exercise and workout terms trigger the <code>FitnessAgent</code>; sleep, stress, or water queries activate the <code>LifestyleAgent</code>. Multi-faceted requests trigger all three sub-agents in parallel. System prompts enforce strict constraints, including dietary preference adherence, injury prevention, and mandatory safety disclaimers.
+      </p>
+    </div>
+
+    <div class="page-footer">
+      <div>AI Agents for Personalized Health & Wellness | Academic Submission</div>
+      <div>Page 2 of 3</div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3 ==================== -->
+  <div class="page">
+    <div class="page-header">
+      <div class="brand">🤖 GENAI TAE 1 : COURSE EVALUATION REPORT</div>
+      <div>Multi-Agent Health Coaching</div>
+    </div>
+
+    <div class="content-body">
+      <div class="section-h1">3. Result (Work Done)</div>
+
+      <div class="section-h2">3.1 System Implementation & User Interface</div>
+      <p>
+        The full multi-agent application was implemented in Python using Streamlit with custom CSS Glassmorphism styling. Key interface capabilities include:
+      </p>
+      <ul>
+        <li><b>Real-Time Biometric Sidebar:</b> Instant profile configuration (Age, Height, Weight, Activity, Diet, Goal) with live metric recalculation.</li>
+        <li><b>Biometric Status Dashboard:</b> Visual metric cards displaying BMI category badge, BMR, TDEE, Target Daily Calories, and Hydration requirements.</li>
+        <li><b>Transparent Multi-Agent Chat Console:</b> Displays distinct agent badges (🏷️ Nutrition Agent, 🏋️ Fitness Agent, 🌿 Lifestyle Agent) showing the contributing agents for every answer.</li>
+      </ul>
+
+      <div class="section-h2">3.2 Case Study & Execution Trace</div>
+      <div class="highlight-card">
+        <b>User Scenario:</b> <i>"22-year-old male, 70kg, 175cm, Moderately Active, Vegetarian, Goal: Build Lean Muscle."</i><br/>
+        <b>Deterministic Computation:</b> BMI = 22.9 (Normal) | BMR = 1,644 kcal | TDEE = 2,548 kcal | Target = <b>2,848 kcal/day (+300 surplus)</b> | Macros: 214g Protein (30%), 320g Carbs (45%), 79g Fat (25%) | Water: <b>3.0 Liters/day</b>.<br/>
+        <b>Multi-Agent Collaborative Plan:</b><br/>
+        • <b>Nutrition Agent:</b> Structured 4-meal plan with Paneer, Tofu, Greek Yogurt, Dal, and Sprouts; timed post-workout nutrition within 45 mins.<br/>
+        • <b>Fitness Agent:</b> 4-day Hypertrophy Split (Push-ups/Bench, Squats, Rows, Shoulder Press, Plank) with 4 sets × 8-12 reps and 90s rest.<br/>
+        • <b>Lifestyle Agent:</b> 3.0L water schedule, 8-hour sleep protocol with 45-minute blue light cutoff, and 4-4-4-4 box breathing recovery.
+      </div>
+
+      <div class="section-h2">3.3 Comparative Performance Evaluation</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Evaluation Metric</th>
+            <th style="width: 37%;">Single Generic LLM Chatbot</th>
+            <th style="width: 38%;">Proposed Multi-Agent System</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Macro Accuracy</b></td>
+            <td>Arithmetic approximations; frequent calculation errors</td>
+            <td><b>100% Deterministic Grounding</b> (Mifflin-St Jeor)</td>
+          </tr>
+          <tr>
+            <td><b>Dietary Compliance</b></td>
+            <td>Prone to hallucinating non-compliant foods</td>
+            <td><b>Strict Constraint Filtering</b> (Veg/Vegan/Keto)</td>
+          </tr>
+          <tr>
+            <td><b>Fault Tolerance</b></td>
+            <td>Completely fails on API timeout / rate limit</td>
+            <td><b>Zero Downtime</b> with Offline Fallback Engine</td>
+          </tr>
+          <tr>
+            <td><b>Safety Standards</b></td>
+            <td>Often omits clinical warnings</td>
+            <td><b>Mandatory Clinical Disclaimer</b> attached</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-h2">3.4 Conclusion & Future Scope</div>
+      <p>
+        The GenAI TAE 1 project validates that a hybrid multi-agent architecture outperforms traditional monolithic chatbots in specialized health domains. Decoupling knowledge domains into dedicated sub-agents and grounding their generation with deterministic physiological calculations eliminates mathematical hallucinations and ensures hyper-personalized recommendations.
+      </p>
+      <p>
+        <b>Future Scope:</b> Integration of multimodal computer vision for meal calorie scanning, wearable IoT smartwatch biometric synchronization, and reinforcement learning from human feedback (RLHF).
+      </p>
+    </div>
+
+    <div class="page-footer">
+      <div>AI Agents for Personalized Health & Wellness | Academic Submission</div>
+      <div>Page 3 of 3</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

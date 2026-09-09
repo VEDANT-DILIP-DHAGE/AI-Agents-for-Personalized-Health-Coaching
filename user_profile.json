@@ -1,0 +1,11 @@
+{
+    "name": "shruti",
+    "age": 20,
+    "gender": "Male",
+    "height_cm": 120.0,
+    "weight_kg": 45.0,
+    "goal": "Stay Fit / Maintenance",
+    "diet_pref": "Non-Vegetarian",
+    "activity_level": "Sedentary (Little/no exercise)",
+    "api_key": ""
+}
