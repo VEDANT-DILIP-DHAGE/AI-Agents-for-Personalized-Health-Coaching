@@ -45,3 +45,5 @@ env/
 # OS generated files
 .DS_Store
 Thumbs.db
+.env.example 
+
